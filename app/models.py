@@ -13,3 +13,4 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
     recipes = db.relationship('Recipe', back_populates='user')  # TODO: cascade
+    # TODO: email verification

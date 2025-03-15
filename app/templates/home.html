@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
 
-<button class="btn btn-primary mt-5" type="button" data-bs-toggle="modal" data-bs-target="#recipeForm">
-    Add recipe
-</button>
+<div style="text-align: right;">
+    <button class="btn btn-success mt-2" type="button" data-bs-toggle="modal" data-bs-target="#recipeForm">Add recipe</button>
+    <a href="#" class="btn btn-primary mt-2">My recipes</a>
+</div>
+
+<div class="container">
+    <form class="d-flex mt-3" method="GET">
+        <input class="form-control me-2" type="search" name="query" placeholder="Search recipes..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+    </form>
+</div>
 
 <div class="modal" id="recipeForm" role="dialog">
     <div class="modal-dialog">
@@ -32,12 +40,12 @@
 
 <div class="container mt-4">
     <div class="row">
-        {% for recipe in recipes %}
+        {% for recipe in recipes %} <!-- TODO: add pagination -->
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">{{ recipe.name }}</h5>
-                    <!-- TO-DO: add pictures in recipes -->
+                    <!-- TODO: add pictures in recipes -->
                     <!-- <img class="card-img-top" src="{{url_for('static', filename='images.jpeg')}}" alt="Card image cap"> -->
                     <p class="card-text text-truncate">{{ recipe.desc }}</p>
                     <div style="text-align: center;">

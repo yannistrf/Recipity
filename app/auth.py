@@ -13,7 +13,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
         if user and password == user.password:
-            login_user(user, remember=True)
+            login_user(user)
             return redirect(url_for("routes.home"))
         else:
             flash("There is no account with these credentials", category="error")
