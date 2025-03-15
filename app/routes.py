@@ -4,7 +4,12 @@ from . import db
 
 routes = Blueprint('routes', __name__)
 
-@routes.route("/", methods=["GET", "POST"])
+@routes.route("/")
+def index():
+    return render_template("index.html")
+
+
+@routes.route("/home", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
         name = request.form.get("recipeName")

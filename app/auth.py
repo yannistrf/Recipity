@@ -14,7 +14,7 @@ def login():
 
 @auth.route("/logout")
 def logout():
-    return redirect(url_for("routes.home"))
+    return redirect(url_for("routes.index"))
 
 @auth.route("/sign-up", methods=["GET", "POST"])
 def sign_up():

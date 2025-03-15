@@ -10,14 +10,17 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-primary">
       <div class="container">
-          <a class="navbar-brand text-white" href="{{ url_for('routes.home') }}">Recipity</a>
-          <div class="ms-auto">
-              <!-- if user not authenticated -->
-              <a href="{{ url_for('auth.login') }}" class="btn btn-light me-2">Login</a>
-              <a href="{{ url_for('auth.sign_up') }}" class="btn btn-light me-2">Sign Up</a>
-              <!-- else if user logged in -->
-              <a href="{{ url_for('auth.logout') }}" class="btn btn-light me-2">Logout</a>
-            </div>
+        <!-- if user is authenticated -->
+        <!-- <a class="navbar-brand text-white" href="{{ url_for('routes.home') }}">Recipity</a> -->
+        <!-- else -->
+        <a class="navbar-brand text-white" href="{{ url_for('routes.index') }}">Recipity</a>
+        <div class="ms-auto">
+          <!-- if user not authenticated -->
+          <a href="{{ url_for('auth.login') }}" class="btn btn-light me-2">Login</a>
+          <a href="{{ url_for('auth.sign_up') }}" class="btn btn-light me-2">Sign Up</a>
+          <!-- else if user logged in -->
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-light me-2">Logout</a>
+        </div>
       </div>
   </nav>
 
