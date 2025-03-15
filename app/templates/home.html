@@ -12,7 +12,7 @@
                 <h5> Create your recipe </h5>
                 <button  type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form class="container">
+            <form class="container" method="POST">
                 <div class="form-group mt-2">
                     <label for="recipeName">Recipe name</label>
                     <input type="text" class="form-control" id="recipeName" name="recipeName" placeholder="Enter the name of the recipe">
@@ -28,6 +28,17 @@
         </div>
         </div>
     </div>
+
+<div class="container">
+
+    <ul class="list-group list-group-flush" id="recipes">
+        {% for recipe in recipes %}
+        <li class="list-group-item">
+          {{ recipe.name }}
+        </li>
+        {% endfor %}
+
+</div>
 
 
 {% endblock %}
