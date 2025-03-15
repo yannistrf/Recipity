@@ -16,7 +16,7 @@ def home():
         name = request.form.get("recipeName")
         desc = request.form.get("recipeDesc")
 
-        recipe = Recipe(name=name, desc=desc)
+        recipe = Recipe(name=name, desc=desc, user_id=current_user.id)
         db.session.add(recipe)
         db.session.commit()
 

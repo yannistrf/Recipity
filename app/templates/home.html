@@ -29,16 +29,26 @@
         </div>
     </div>
 
-<div class="container">
 
-    <ul class="list-group list-group-flush" id="recipes">
+<div class="container mt-4">
+    <div class="row">
         {% for recipe in recipes %}
-            <li class="list-group-item">
-            {{ recipe.name }}
-            </li>
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.name }}</h5>
+                    <!-- TO-DO: add pictures in recipes -->
+                    <!-- <img class="card-img-top" src="{{url_for('static', filename='images.jpeg')}}" alt="Card image cap"> -->
+                    <p class="card-text text-truncate">{{ recipe.desc }}</p>
+                    <div style="text-align: center;">
+                        <a href="#" class="btn btn-primary"><small> View Recipe </small></a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted"><small> Created by: {{ recipe.user.username }} </small></div>
+            </div>
+        </div>
         {% endfor %}
-
+    </div>
 </div>
-
 
 {% endblock %}

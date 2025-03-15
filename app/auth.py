@@ -33,10 +33,16 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
+        # TODO: hash password and add complexity check
         if password1 != password2:
             flash("Passwords dont match", category="error")
             return redirect(url_for("auth.sign_up"))
         
+        user = User.query.filter_by(username=username).first()
+        if user:
+            flash("Username already in use", category="error")
+            return redirect(url_for("auth.sign_up"))
+
         new_user = User(username=username, password=password1)
         db.session.add(new_user)
         db.session.commit()
