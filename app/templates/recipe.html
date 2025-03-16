@@ -1,11 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
 
-{{ recipe.id }} <br>
-{{ recipe.name }} <br>
-{{ recipe.desc }} <br>
+<style>
+    .recipe-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
 
-<img src="{{ url_for('static', filename=recipe.photo_path) }}" style="max-width: 300px; max-height: 300px;"> <br>
-{{ recipe.photo_path }}
+    .recipe-photo {
+        flex: 1;
+        max-width: 300px;
+        margin-left: 20px;
+    }
+
+    .recipe-description {
+        flex: 5;
+        margin-right: 20px;
+        overflow-x: hidden;
+        white-space: pre-wrap;  /* Maintains newlines */
+        word-wrap: break-word;  /* Prevents horizontal scrolling */
+        overflow-wrap: break-word;  /* Ensures word wrapping */
+    }
+</style>
+
+
+<div class="container mt-5">
+    <h1 class="display-4">{{ recipe.name }}</h1>
+
+    <div class="recipe-container">
+        <div class="container recipe-description">
+            <p class="lead">{{ recipe.desc }}</p>
+        </div>
+
+        {% if "default" not in recipe.photo_path %} <!-- if it's the default photo leave it empty -->
+            <div class="my-4 recipe-photo">
+                <img src="{{ url_for('static', filename=recipe.photo_path) }}" class="img-thumbnail" style="max-width: 300px; max-height: 300px;"> <br>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
 
 {% endblock %}
