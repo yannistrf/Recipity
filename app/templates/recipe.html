@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+
+{{ recipe.id }} <br>
+{{ recipe.name }} <br>
+{{ recipe.desc }} <br>
+
+<img src="{{ url_for('static', filename=recipe.photo_path) }}" style="max-width: 300px; max-height: 300px;"> <br>
+{{ recipe.photo_path }}
+
+{% endblock %}

@@ -1,9 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
 
 db = SQLAlchemy()
 DB_NAME = "recipity.db"
+UPLOAD_FOLDER = "./app/static/photo_uploads"
+STATIC_UPLOAD_FOLDER = "./photo_uploads"
 
 def create_app():
     # avoid circular dependency
@@ -30,5 +33,8 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
+
+    if not os.path.isdir(UPLOAD_FOLDER):
+        os.mkdir(UPLOAD_FOLDER)
 
     return app

@@ -20,7 +20,7 @@
                 <h5> Create your recipe </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form class="container" method="POST">
+            <form class="container" method="POST" enctype="multipart/form-data">
                 <div class="form-group mt-2">
                     <label for="recipeName">Recipe name</label>
                     <input type="text" class="form-control" id="recipeName" name="recipeName" placeholder="Enter the name of the recipe">
@@ -28,6 +28,10 @@
                 <div class="form-group mt-2">
                     <label for="recipeDesc">Recipe description</label>
                     <textarea type="text" class="form-control" id="recipeDesc" name="recipeDesc" rows="10" placeholder="Enter the instructions for the recipe"></textarea>
+                </div>
+                <div class="custom-file mt-3">
+                    <input type="file" accept="image/*" class="custom-file-input" id="recipePhoto" name="recipePhoto">
+                    <label class="custom-file-label" for="recipePhoto">Upload a photo</label>
                 </div>
                 <div class="my-3" style="text-align: center;">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -46,10 +50,10 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ recipe.name }}</h5>
                     <!-- TODO: add pictures in recipes -->
-                    <!-- <img class="card-img-top" src="{{url_for('static', filename='images.jpeg')}}" alt="Card image cap"> -->
+                    <img class="card-img-top img-fluid object-fit-scale" src="{{ url_for('static', filename=recipe.photo_path) }}" style="width: 100%; max-height: 200px; object-fit: cover;">
                     <p class="card-text text-truncate">{{ recipe.desc }}</p>
                     <div style="text-align: center;">
-                        <a href="#" class="btn btn-primary"><small> View Recipe </small></a>
+                        <a href="{{ url_for('routes.recipe', recipe_id=recipe.id) }}" class="btn btn-primary"><small> View Recipe </small></a>
                     </div>
                 </div>
                 <div class="card-footer text-muted"><small> Created by: {{ recipe.user.username }} </small></div>

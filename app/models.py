@@ -5,6 +5,7 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     desc = db.Column(db.String(1000), nullable=False)
+    photo_path = db.Column(db.String(1000), nullable=True)
     user_id = db.Column(db.String(128), db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='recipes')
 

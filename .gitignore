@@ -1,3 +1,4 @@
 .venv
 __pycache__
 instance/*
+app/static/photo_uploads/*
