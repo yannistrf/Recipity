@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
@@ -60,11 +60,20 @@ def home():
         recipes = Recipe.query.all()
     return render_template("home.html", user=current_user, recipes=recipes)
 
-@routes.route("/recipe/<int:recipe_id>")
+@routes.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
 @login_required
 def recipe(recipe_id):
     rec = Recipe.query.get(recipe_id)
-    return render_template("recipe.html", user=current_user, recipe=rec)
+
+    if request.method == "GET":
+        return render_template("recipe.html", user=current_user, recipe=rec)
+
+    if current_user.id != rec.user_id:
+        abort(401)
+
+    db.session.delete(rec)
+    db.session.commit()
+    return redirect(url_for("routes.home"))
 
 @routes.route("user/<int:user_id>/recipes")
 def user_recipes(user_id):

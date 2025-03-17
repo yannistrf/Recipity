@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div style="text-align: right;">
-    <button class="btn btn-success mt-2" type="button" data-bs-toggle="modal" data-bs-target="#recipeForm">Add recipe</button>
-    <a href="{{ url_for('routes.user_recipes', user_id=user.id) }}" class="btn btn-primary mt-2">My recipes</a>
+<div class="container mt-2" style="display: flex; justify-content: space-between;">
+    <p class="display-6" style="height: 2rem;"> Hello {{ user.username }}! </p>
+    <div style="text-align: right;">
+        <button class="btn btn-success mt-2" type="button" data-bs-toggle="modal" data-bs-target="#recipeForm">Add recipe</button>
+        <a href="{{ url_for('routes.user_recipes', user_id=user.id) }}" class="btn btn-primary mt-2">My recipes</a>
+    </div>
 </div>
-
 <div class="container">
     <form class="d-flex mt-3" method="GET">
         <input class="form-control me-2" type="search" name="query" placeholder="Search recipes..." aria-label="Search">

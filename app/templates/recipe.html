@@ -28,10 +28,12 @@
 <div class="container mt-5">
     <div class="container" style="display: flex;  justify-content: space-between; align-items: flex-start;">
         <h1 class="display-4">{{ recipe.name }}</h1>
-        {% if user.id == recipe.user_id %}
-            <button class="btn btn-danger mt-3">Delete recipe</button>
-        {% endif %}
-        </div>
+        <form action="#" method="post">
+            {% if user.id == recipe.user_id %}
+                <button class="btn btn-danger mt-3" type="submit">Delete recipe</button>
+            {% endif %}
+        </form>
+    </div>
     <div class="recipe-container">
         <div class="container recipe-description">
             <p class="lead">{{ recipe.desc }}</p>
@@ -43,7 +45,6 @@
             </div>
         {% endif %}
     </div>
-
 </div>
 
 {% endblock %}
