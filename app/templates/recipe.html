@@ -18,7 +18,6 @@
     .recipe-description {
         flex: 5;
         margin-right: 20px;
-        overflow-x: hidden;
         white-space: pre-wrap;  /* Maintains newlines */
         word-wrap: break-word;  /* Prevents horizontal scrolling */
         overflow-wrap: break-word;  /* Ensures word wrapping */
@@ -27,8 +26,12 @@
 
 
 <div class="container mt-5">
-    <h1 class="display-4">{{ recipe.name }}</h1>
-
+    <div class="container" style="display: flex;  justify-content: space-between; align-items: flex-start;">
+        <h1 class="display-4">{{ recipe.name }}</h1>
+        {% if user.id == recipe.user_id %}
+            <button class="btn btn-danger mt-3">Delete recipe</button>
+        {% endif %}
+        </div>
     <div class="recipe-container">
         <div class="container recipe-description">
             <p class="lead">{{ recipe.desc }}</p>

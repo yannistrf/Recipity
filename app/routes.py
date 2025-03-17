@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
-from .models import Recipe
+from .models import Recipe, User
 from . import db, UPLOAD_FOLDER, STATIC_UPLOAD_FOLDER
 from os.path import join
 
@@ -21,6 +21,13 @@ def home():
     if request.method == "POST":
         name = request.form.get("recipeName")
         desc = request.form.get("recipeDesc")
+
+        if not name:
+            flash("Must provide a recipe name", category="error")
+            return redirect(url_for("routes.home"))
+        if not desc:
+            flash("Must provide a recipe description", category="error")
+            return redirect(url_for("routes.home"))
 
         photo_path = "default_recipe.png"
         if "recipePhoto" in request.files:  # check if the post request has the file part
@@ -58,3 +65,8 @@ def home():
 def recipe(recipe_id):
     rec = Recipe.query.get(recipe_id)
     return render_template("recipe.html", user=current_user, recipe=rec)
+
+@routes.route("user/<int:user_id>/recipes")
+def user_recipes(user_id):
+    user = User.query.get(user_id)
+    return render_template("profile.html", user=current_user, recipes=user.recipes, visiting_user=user)

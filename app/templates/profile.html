@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    {% if user.id == visiting_user.id %}
+        <p class="lead">My recipes</p>
+    {% else %}
+        <p class="lead">Recipes created by <b>{{ visiting_user.username }}</b></p>
+    {% endif %}
+</div>
+
+{% include 'recipe_cards.html' %}
+
+{% endblock %}

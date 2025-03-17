@@ -6,7 +6,7 @@ class Recipe(db.Model):
     name = db.Column(db.String(128), nullable=False)
     desc = db.Column(db.Text, nullable=False)
     photo_path = db.Column(db.String(1000), nullable=True)
-    user_id = db.Column(db.String(128), db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='recipes')
 
 class User(db.Model, UserMixin):
