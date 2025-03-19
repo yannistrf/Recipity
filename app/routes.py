@@ -47,6 +47,10 @@ def home():
 
         return redirect(url_for("routes.home"))
 
+    page = 1
+    if "page" in request.args.keys():
+        page = int(request.args["page"])
+
     if "query" in request.args.keys():
         query = request.args["query"]
         # check recipe name and recipe description for keyword
@@ -55,9 +59,10 @@ def home():
                 Recipe.name.like(f"%{query}%"), 
                 Recipe.desc.like(f"%{query}%")
             )
-        ).all()
+        ).paginate(page=page, per_page=9, error_out=False)
     else:
-        recipes = Recipe.query.all()
+        # recipes = Recipe.query.all()
+        recipes = Recipe.query.paginate(page=page, per_page=9, error_out=False)
     return render_template("home.html", user=current_user, recipes=recipes)
 
 @routes.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
@@ -77,5 +82,11 @@ def recipe(recipe_id):
 
 @routes.route("user/<int:user_id>/recipes")
 def user_recipes(user_id):
-    user = User.query.get(user_id)
-    return render_template("profile.html", user=current_user, recipes=user.recipes, visiting_user=user)
+    user = User.query.get_or_404(user_id)
+
+    page = 1
+    if "page" in request.args.keys():
+        page = int(request.args["page"])
+    
+    recipes = Recipe.query.filter_by(user_id=user.id).paginate(page=page, per_page=9, error_out=False)
+    return render_template("profile.html", user=current_user, recipes=recipes, visiting_user=user)
