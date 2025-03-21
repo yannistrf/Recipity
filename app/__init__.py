@@ -2,11 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+import random
+import json
 
 db = SQLAlchemy()
 DB_NAME = "recipity.db"
 UPLOAD_FOLDER = "./app/static/photo_uploads"
 STATIC_UPLOAD_FOLDER = "./photo_uploads"
+TEST_DATA = "./app/test_data.json"
 
 def create_app():
     # avoid circular dependency
@@ -25,6 +28,7 @@ def create_app():
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        create_test_data()
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login' # prompt to login page if login required
@@ -38,3 +42,30 @@ def create_app():
         os.mkdir(UPLOAD_FOLDER)
 
     return app
+
+def create_test_data():
+    from .models import Recipe, User
+    
+    # Check if data already exists
+    if User.query.first() is not None:
+        return
+
+    with open(TEST_DATA) as f:
+        data = json.load(f)
+
+    sample_users = []
+    for user_data in data["users"]:
+        sample_users.append(User(username=user_data["username"], password=user_data["password"]))
+
+    sample_recipes = []
+    for recipe_data in data["recipes"]:
+        sample_recipes.append(Recipe(name=recipe_data["name"], desc=recipe_data["desc"],
+                                     user_id=random.randint(1, len(sample_users)),
+                                     photo_path=STATIC_UPLOAD_FOLDER + "/" + recipe_data["photo"])
+                            )
+        
+
+    db.session.bulk_save_objects(sample_users)
+    db.session.bulk_save_objects(sample_recipes)
+    db.session.commit()
+    print("Test data inserted!")
