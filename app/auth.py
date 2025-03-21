@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, login_user, logout_user, current_user
 from .models import User
-from . import db
+from . import db, hashing
 
 auth = Blueprint('auth', __name__)
 
@@ -12,7 +12,7 @@ def login():
         password = request.form.get("password")
 
         user = User.query.filter_by(username=username).first()
-        if user and password == user.password:
+        if user and hashing.check_value(user.password, password, username):
             login_user(user)
             return redirect(url_for("routes.home"))
         else:
@@ -43,7 +43,11 @@ def sign_up():
             flash("Username already in use", category="error")
             return redirect(url_for("auth.sign_up"))
 
-        new_user = User(username=username, password=password1)
+        # use as salt the username, unique each time, not ideal but good for now
+        # TODO: make salt a random number and store it in plain text ?
+        password = hashing.hash_value(password1, username)
+
+        new_user = User(username=username, password=password)
         db.session.add(new_user)
         db.session.commit()
 

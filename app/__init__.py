@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_hashing import Hashing
 import os
 import random
 import json
 
 db = SQLAlchemy()
+hashing = Hashing()
 DB_NAME = "recipity.db"
 UPLOAD_FOLDER = "./app/static/photo_uploads"
 STATIC_UPLOAD_FOLDER = "./photo_uploads"
@@ -29,6 +31,8 @@ def create_app():
     with app.app_context():
         db.create_all()
         create_test_data()
+
+    hashing.init_app(app)
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login' # prompt to login page if login required
@@ -55,7 +59,9 @@ def create_test_data():
 
     sample_users = []
     for user_data in data["users"]:
-        sample_users.append(User(username=user_data["username"], password=user_data["password"]))
+        username = user_data["username"]
+        password = hashing.hash_value(user_data["password"], username)
+        sample_users.append(User(username=username, password=password))
 
     sample_recipes = []
     for recipe_data in data["recipes"]:
