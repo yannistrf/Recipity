@@ -80,6 +80,44 @@ def recipe(recipe_id):
     db.session.commit()
     return redirect(url_for("routes.home"))
 
+@routes.route("/recipe/<int:recipe_id>/like")
+@login_required
+def like_recipe(recipe_id):
+    rec = Recipe.query.get(recipe_id)
+
+    if rec not in current_user.liked_recipes:
+        current_user.liked_recipes.append(rec)
+        # rec.liked_by_users.append(current_user)   # same thing
+
+        if rec in current_user.disliked_recipes:
+            current_user.disliked_recipes.remove(rec)
+        db.session.commit()
+    else:
+        current_user.liked_recipes.remove(rec)
+        db.session.commit()
+
+    return redirect(url_for("routes.recipe", recipe_id=recipe_id))
+
+@routes.route("/recipe/<int:recipe_id>/dislike")
+@login_required
+def dislike_recipe(recipe_id):
+    rec = Recipe.query.get(recipe_id)
+
+    if rec not in current_user.disliked_recipes:
+        current_user.disliked_recipes.append(rec)
+        # rec.disliked_by_users.append(current_user)   # same thing
+        
+        if rec in current_user.liked_recipes:
+            current_user.liked_recipes.remove(rec)
+        db.session.commit()
+    else:
+        current_user.disliked_recipes.remove(rec)
+        db.session.commit()
+
+    return redirect(url_for("routes.recipe", recipe_id=recipe_id))
+
+
+
 @routes.route("user/<int:user_id>/recipes")
 def user_recipes(user_id):
     user = User.query.get_or_404(user_id)

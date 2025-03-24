@@ -26,13 +26,37 @@
 
 
 <div class="container mt-5">
-    <div class="container" style="display: flex;  justify-content: space-between; align-items: flex-start;">
-        <h1 class="display-4">{{ recipe.name }}</h1>
-        <form action="#" method="post">
-            {% if user.id == recipe.user_id %}
-                <button class="btn btn-danger mt-3" type="submit">Delete recipe</button>
-            {% endif %}
-        </form>
+    <h1 class="display-4">{{ recipe.name }}</h1>
+    <div class="container mt-3" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div class="d-flex">
+            <form action="{{ url_for('routes.like_recipe', recipe_id=recipe.id) }}">
+                {% if current_user in recipe.liked_by_users %}
+                    <button id="likeBtn" class="btn btn-primary me-2" type="submit">
+                        <i class="bi bi-hand-thumbs-up"></i> <span id="likeCount">{{ recipe.liked_by_users|length }}</span>
+                    </button>
+                {% else %}
+                    <button id="likeBtn" class="btn btn-outline-primary me-2" type="submit">
+                        <i class="bi bi-hand-thumbs-up"></i> <span id="likeCount">{{ recipe.liked_by_users|length }}</span>
+                    </button>
+                {% endif %}
+            </form>
+            <form action="{{ url_for('routes.dislike_recipe', recipe_id=recipe.id) }}">
+                {% if current_user in recipe.disliked_by_users %}
+                    <button id="dislikeBtn" class="btn btn-danger" type="submit">
+                        <i class="bi bi-hand-thumbs-down"></i> <span id="dislikeCount">{{ recipe.disliked_by_users|length }}</span>
+                    </button>
+                {% else %}
+                    <button id="dislikeBtn" class="btn btn-outline-danger" type="submit">
+                        <i class="bi bi-hand-thumbs-down"></i> <span id="dislikeCount">{{ recipe.disliked_by_users|length }}</span>
+                    </button>
+                {% endif %}
+            </form>
+        </div>
+        {% if user.id == recipe.user_id %}
+            <form action="#" method="post">
+                <button class="btn btn-danger mt-3 mx-2" type="submit">Delete recipe</button>
+            </form>
+        {% endif %}
     </div>
     <div class="recipe-container">
         <div class="container recipe-description">
