@@ -11,7 +11,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        user = User.query.filter_by(username=username).first()
+        user = db.session.execute(db.select(User).filter_by(username=username)).scalar()
         if user and hashing.check_value(user.password, password, username):
             login_user(user)
             return redirect(url_for("routes.home"))
@@ -38,7 +38,7 @@ def sign_up():
             flash("Passwords dont match", category="error")
             return redirect(url_for("auth.sign_up"))
         
-        user = User.query.filter_by(username=username).first()
+        user = db.session.execute(db.select(User).filter_by(username=username)).scalar()
         if user:
             flash("Username already in use", category="error")
             return redirect(url_for("auth.sign_up"))

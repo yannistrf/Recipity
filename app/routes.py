@@ -54,21 +54,22 @@ def home():
     if "query" in request.args.keys():
         query = request.args["query"]
         # check recipe name and recipe description for keyword
-        recipes = Recipe.query.filter(
+
+        stmt = db.select(Recipe).where(
             or_(
-                Recipe.name.like(f"%{query}%"), 
-                Recipe.desc.like(f"%{query}%")
-            )
-        ).paginate(page=page, per_page=9, error_out=False)
+                Recipe.name.ilike(f"%{query}%"), 
+                Recipe.desc.ilike(f"%{query}%")
+            ))
+        recipes = db.paginate(stmt, page=page, per_page=9, error_out=False)
+
     else:
-        # recipes = Recipe.query.all()
-        recipes = Recipe.query.paginate(page=page, per_page=9, error_out=False)
+        recipes = db.paginate(db.select(Recipe), page=page, per_page=9, error_out=False)
     return render_template("home.html", user=current_user, recipes=recipes)
 
 @routes.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
 @login_required
 def recipe(recipe_id):
-    rec = Recipe.query.get(recipe_id)
+    rec = db.session.get(Recipe, recipe_id)
 
     if request.method == "GET":
         return render_template("recipe.html", user=current_user, recipe=rec)
@@ -83,7 +84,7 @@ def recipe(recipe_id):
 @routes.route("/recipe/<int:recipe_id>/like")
 @login_required
 def like_recipe(recipe_id):
-    rec = Recipe.query.get(recipe_id)
+    rec = db.session.get(Recipe, recipe_id)
 
     if rec not in current_user.liked_recipes:
         current_user.liked_recipes.append(rec)
@@ -101,7 +102,7 @@ def like_recipe(recipe_id):
 @routes.route("/recipe/<int:recipe_id>/dislike")
 @login_required
 def dislike_recipe(recipe_id):
-    rec = Recipe.query.get(recipe_id)
+    rec = db.session.get(Recipe, recipe_id)
 
     if rec not in current_user.disliked_recipes:
         current_user.disliked_recipes.append(rec)
@@ -119,12 +120,14 @@ def dislike_recipe(recipe_id):
 
 
 @routes.route("user/<int:user_id>/recipes")
+@login_required
 def user_recipes(user_id):
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
 
     page = 1
     if "page" in request.args.keys():
         page = int(request.args["page"])
     
-    recipes = Recipe.query.filter_by(user_id=user.id).paginate(page=page, per_page=9, error_out=False)
+    recipes = db.paginate(db.select(Recipe).filter_by(user_id=user_id),
+                          page=page, per_page=9, error_out=False)
     return render_template("profile.html", user=current_user, recipes=recipes, visiting_user=user)

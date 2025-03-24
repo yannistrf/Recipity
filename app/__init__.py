@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_hashing import Hashing
+from sqlalchemy import func, select
 import os
 import random
 import json
@@ -40,7 +41,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        return User.query.get(int(id))
+        return db.session.get(User, int(id))
 
     if not os.path.isdir(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
@@ -51,7 +52,7 @@ def create_test_data():
     from .models import Recipe, User
     
     # Check if data already exists
-    if User.query.first() is not None:
+    if db.session.execute(db.select(func.count()).select_from(User)).scalar() != 0:
         return
 
     with open(TEST_DATA) as f:
