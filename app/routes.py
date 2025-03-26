@@ -131,3 +131,37 @@ def user_recipes(user_id):
     recipes = db.paginate(db.select(Recipe).filter_by(user_id=user_id),
                           page=page, per_page=9, error_out=False)
     return render_template("profile.html", user=current_user, recipes=recipes, visiting_user=user)
+
+
+@routes.route("/recipe/<int:recipe_id>/save")
+@login_required
+def save_recipe(recipe_id):
+    rec = db.session.get(Recipe, recipe_id)
+
+    if rec not in current_user.saved_recipes:
+        current_user.saved_recipes.append(rec)
+    else:
+        current_user.saved_recipes.remove(rec)
+
+    db.session.commit()
+
+    return redirect(url_for("routes.recipe", recipe_id=recipe_id))
+
+@routes.route("user/<int:user_id>/saved")
+@login_required
+def user_saved_recipes(user_id):
+
+    if user_id != current_user.id:
+        abort(403)
+
+    user = db.get_or_404(User, user_id)
+
+    page = 1
+    if "page" in request.args.keys():
+        page = int(request.args["page"])
+
+    stmt = db.select(Recipe).where(Recipe.id.in_([r.id for r in user.saved_recipes]))
+    saved_recipes_pagination = db.paginate(stmt, page=page, per_page=9, error_out=False)
+
+    return render_template("saved_recipes.html", user=current_user, recipes=saved_recipes_pagination)
+    
