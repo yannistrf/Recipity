@@ -4,7 +4,8 @@ from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 from .models import Recipe, User
 from . import db, UPLOAD_FOLDER, STATIC_UPLOAD_FOLDER
-from os.path import join
+from os.path import join, splitext
+import uuid
 
 routes = Blueprint('routes', __name__)
 
@@ -36,8 +37,9 @@ def home():
             # empty file without a filename.
             if photo.filename != "" and photo.filename.endswith((".png", ".jpg", ".jpeg")):
                 filename = secure_filename(photo.filename)
+                filename, file_extension = splitext(filename)
+                filename = str(uuid.uuid4()) + file_extension   # create unique filename so that we can store it safely
                 photo_path = join(UPLOAD_FOLDER, filename)
-                # TODO: need to check if the file is unique
                 photo.save(photo_path)
                 photo_path = join(STATIC_UPLOAD_FOLDER, filename)
 
