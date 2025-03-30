@@ -1,9 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, login_user, logout_user, current_user
+from password_strength import PasswordPolicy
 from .models import User
 from . import db, hashing
 
 auth = Blueprint('auth', __name__)
+password_policy = PasswordPolicy.from_names(
+    length=8,  # min length: 8
+    uppercase=1,  # need min. 1 uppercase letters
+    numbers=1,  # need min. 1 digits
+    special=1,  # need min. 1 special characters
+)
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
@@ -33,11 +40,14 @@ def sign_up():
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
-        # TODO: hash password and add complexity check
         if password1 != password2:
             flash("Passwords dont match", category="error")
             return redirect(url_for("auth.sign_up"))
         
+        if len(password_policy.test(password1)) != 0:
+            flash("Must be at least 8 characters, include a number, uppercase letter, and a special character.", category="error")
+            return redirect(url_for("auth.sign_up"))
+
         user = db.session.execute(db.select(User).filter_by(username=username)).scalar()
         if user:
             flash("Username already in use", category="error")
