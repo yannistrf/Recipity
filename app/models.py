@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy import func, select
 from . import db
 
 user_likes_recipe = db.Table('user_likes_recipe',
@@ -27,6 +28,16 @@ class Recipe(db.Model):
     liked_by_users = db.relationship('User', secondary=user_likes_recipe, back_populates='liked_recipes')
     disliked_by_users = db.relationship('User', secondary=user_dislikes_recipe, back_populates='disliked_recipes')
     saved_by_users = db.relationship('User', secondary=user_save_recipe, back_populates='saved_recipes')
+
+    @classmethod
+    def get_like_ratio(cls):
+        likes = select(func.count()).where(user_likes_recipe.c.recipe_id == cls.id).scalar_subquery()
+        dislikes = select(func.count()).where(user_dislikes_recipe.c.recipe_id == cls.id).scalar_subquery()
+
+        # check like-dislike difference and consider as a weight the amount of people that voted
+        # also add 0.01 in case likes == dislikes so that the weight is taken into account
+        return (likes - dislikes + 0.01) * (likes + dislikes)
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

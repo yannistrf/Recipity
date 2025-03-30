@@ -58,21 +58,29 @@ def create_test_data():
     with open(TEST_DATA) as f:
         data = json.load(f)
 
-    sample_users = []
     for user_data in data["users"]:
         username = user_data["username"]
         password = hashing.hash_value(user_data["password"], username)
-        sample_users.append(User(username=username, password=password))
+        db.session.add(User(username=username, password=password))
 
-    sample_recipes = []
+    users_count = len(data["users"])
+
     for recipe_data in data["recipes"]:
-        sample_recipes.append(Recipe(name=recipe_data["name"], desc=recipe_data["desc"],
-                                     user_id=random.randint(1, len(sample_users)),
+        recipe = Recipe(name=recipe_data["name"], desc=recipe_data["desc"],
+                                     user_id=random.randint(1, users_count),
                                      photo_path=STATIC_UPLOAD_FOLDER + "/" + recipe_data["photo"])
-                            )
-        
 
-    db.session.bulk_save_objects(sample_users)
-    db.session.bulk_save_objects(sample_recipes)
+        db.session.add(recipe)
+
+        # get random users and in random like or dislike the recipe
+        rand_user_ids = random.sample(range(1, users_count + 1), random.randint(1, users_count))
+        for user_id in rand_user_ids:
+            user = db.session.get(User, user_id)
+            if random.randint(0, 1):
+                recipe.liked_by_users.append(user)
+            else:
+                recipe.disliked_by_users.append(user)
+
+        
     db.session.commit()
     print("Test data inserted!")

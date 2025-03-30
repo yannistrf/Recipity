@@ -59,11 +59,11 @@ def home():
             or_(
                 Recipe.name.ilike(f"%{query}%"), 
                 Recipe.desc.ilike(f"%{query}%")
-            ))
+            )).order_by(Recipe.get_like_ratio().desc())
         recipes = db.paginate(stmt, page=page, per_page=9, error_out=False)
 
     else:
-        recipes = db.paginate(db.select(Recipe), page=page, per_page=9, error_out=False)
+        recipes = db.paginate(db.select(Recipe).order_by(Recipe.get_like_ratio().desc()), page=page, per_page=9, error_out=False)
     return render_template("home.html", user=current_user, recipes=recipes)
 
 @routes.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
@@ -128,7 +128,7 @@ def user_recipes(user_id):
     if "page" in request.args.keys():
         page = int(request.args["page"])
     
-    recipes = db.paginate(db.select(Recipe).filter_by(user_id=user_id),
+    recipes = db.paginate(db.select(Recipe).filter_by(user_id=user_id).order_by(Recipe.get_like_ratio().desc()),
                           page=page, per_page=9, error_out=False)
     return render_template("profile.html", user=current_user, recipes=recipes, visiting_user=user)
 
@@ -160,7 +160,7 @@ def user_saved_recipes(user_id):
     if "page" in request.args.keys():
         page = int(request.args["page"])
 
-    stmt = db.select(Recipe).where(Recipe.id.in_([r.id for r in user.saved_recipes]))
+    stmt = db.select(Recipe).where(Recipe.id.in_([r.id for r in user.saved_recipes])).order_by(Recipe.get_like_ratio().desc())
     saved_recipes_pagination = db.paginate(stmt, page=page, per_page=9, error_out=False)
 
     return render_template("saved_recipes.html", user=current_user, recipes=saved_recipes_pagination)
