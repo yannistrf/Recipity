@@ -85,7 +85,7 @@ def create_test_data():
     users_count = len(data["users"])
 
     for recipe_data in data["recipes"]:
-        recipe = Recipe(name=recipe_data["name"], desc=recipe_data["desc"],
+        recipe = Recipe(name=recipe_data["name"], ingredients=recipe_data["ingredients"], desc=recipe_data["desc"],
                                      user_id=random.randint(1, users_count),
                                      photo_path=STATIC_UPLOAD_FOLDER + "/" + recipe_data["photo"])
 

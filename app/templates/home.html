@@ -29,6 +29,12 @@
                     <input type="text" class="form-control" id="recipeName" name="recipeName" placeholder="Enter the name of the recipe">
                 </div>
                 <div class="form-group mt-2">
+                    <label for="ingredientsList">Ingredients</label>
+                    <div id="ingredientsList" style="overflow: hidden;">
+                        <button type="button" class="btn btn-success mb-2" style="float: right;" onclick="addIngredient()">Add</button>
+                    </div>
+                </div>
+                <div class="form-group mt-2">
                     <label for="recipeDesc">Recipe description</label>
                     <textarea type="text" class="form-control" id="recipeDesc" name="recipeDesc" rows="10" placeholder="Enter the instructions for the recipe"></textarea>
                 </div>
@@ -43,6 +49,21 @@
         </div>
     </div>
 </div>
+
+<script>
+    let ingredient_idx = 0;
+    function addIngredient() {
+        const container = document.getElementById('ingredientsList');
+        const inputGroup = document.createElement('div');
+        inputGroup.className = 'input-group mt-2';
+        inputGroup.innerHTML = `
+            <input type="text" name="ingredient${ingredient_idx}" id="ingredient${ingredient_idx}" class="form-control" placeholder="Enter an ingredient">
+            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()"><i class="bi bi-trash"></i></button>
+        `;
+        container.appendChild(inputGroup);
+        ingredient_idx++;
+    }
+</script>
 
 {% include 'recipe_cards.html' %}
 

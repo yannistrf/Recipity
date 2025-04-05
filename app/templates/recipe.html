@@ -27,7 +27,7 @@
 
 <div class="container mt-5">
     <h1 class="display-4">{{ recipe.name }}</h1>
-    <div class="container mt-3" style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
         <div class="d-flex">
             <form action="{{ url_for('routes.like_recipe', recipe_id=recipe.id) }}">
                 {% if current_user in recipe.liked_by_users %}
@@ -70,15 +70,27 @@
         {% endif %}
     </div>
     <div class="recipe-container">
+        <div class="container mt-3">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap-reverse;">
+                <div class="container" style="flex: 1 1;">
+                    <p class="lead"><b> Ingredients </b></p>
+                    <ul>
+                        {% for ingredient in recipe.ingredients.split(";") %}
+                            <li class="lead"> {{ ingredient }} </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if "default" not in recipe.photo_path %} <!-- if it's the default photo leave it empty -->
+                    <div class="my-4 recipe-photo">
+                        <img src="{{ url_for('static', filename=recipe.photo_path) }}" class="img-thumbnail" style="max-width: 300px; max-height: 300px;"> <br>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
         <div class="container recipe-description">
             <p class="lead">{{ recipe.desc }}</p>
         </div>
 
-        {% if "default" not in recipe.photo_path %} <!-- if it's the default photo leave it empty -->
-            <div class="my-4 recipe-photo">
-                <img src="{{ url_for('static', filename=recipe.photo_path) }}" class="img-thumbnail" style="max-width: 300px; max-height: 300px;"> <br>
-            </div>
-        {% endif %}
     </div>
 </div>
 

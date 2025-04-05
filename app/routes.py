@@ -24,10 +24,22 @@ def home():
     if request.method == "POST":
         name = request.form.get("recipeName")
         desc = request.form.get("recipeDesc")
+        ingredients = []
+        for element in request.form:
+            # we dont know the number of ingredients so check one by one
+            if "ingredient" in element and len(request.form.get(element)) > 0:
+                ingredients.append(request.form.get(element))
 
         if not name:
             flash("Must provide a recipe name", category="error")
             return redirect(url_for("routes.home"))
+
+        if len(ingredients) == 0:
+            flash("Must provide some ingredients", category="error")
+            return redirect(url_for("routes.home"))
+        # store ingredients as one text, each ingredient seperated by ';'
+        ingredients_text = ";".join(ingredients)
+
         if not desc:
             flash("Must provide a recipe description", category="error")
             return redirect(url_for("routes.home"))
@@ -45,7 +57,7 @@ def home():
                 photo.save(photo_path)
                 photo_path = join(STATIC_UPLOAD_FOLDER, filename)
 
-        recipe = Recipe(name=name, desc=desc, photo_path=photo_path, user_id=current_user.id)
+        recipe = Recipe(name=name, ingredients=ingredients_text, desc=desc, photo_path=photo_path, user_id=current_user.id)
         db.session.add(recipe)
         db.session.commit()
 
@@ -74,7 +86,7 @@ def home():
 @login_required
 @verified_required
 def recipe(recipe_id):
-    rec = db.session.get(Recipe, recipe_id)
+    rec = db.get_or_404(Recipe, recipe_id)
 
     if request.method == "GET":
         return render_template("recipe.html", user=current_user, recipe=rec)
@@ -90,7 +102,7 @@ def recipe(recipe_id):
 @login_required
 @verified_required
 def like_recipe(recipe_id):
-    rec = db.session.get(Recipe, recipe_id)
+    rec = db.get_or_404(Recipe, recipe_id)
 
     if rec not in current_user.liked_recipes:
         current_user.liked_recipes.append(rec)
@@ -109,7 +121,7 @@ def like_recipe(recipe_id):
 @login_required
 @verified_required
 def dislike_recipe(recipe_id):
-    rec = db.session.get(Recipe, recipe_id)
+    rec = db.get_or_404(Recipe, recipe_id)
 
     if rec not in current_user.disliked_recipes:
         current_user.disliked_recipes.append(rec)
@@ -145,7 +157,7 @@ def user_recipes(user_id):
 @login_required
 @verified_required
 def save_recipe(recipe_id):
-    rec = db.session.get(Recipe, recipe_id)
+    rec = db.get_or_404(Recipe, recipe_id)
 
     if rec not in current_user.saved_recipes:
         current_user.saved_recipes.append(rec)
