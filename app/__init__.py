@@ -2,13 +2,16 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_hashing import Hashing
+from flask_mail import Mail
 from sqlalchemy import func, select
 import os
 import random
 import json
+from dotenv import load_dotenv
 
 db = SQLAlchemy()
 hashing = Hashing()
+mail = Mail()
 DB_NAME = "recipity.db"
 UPLOAD_FOLDER = "./app/static/photo_uploads"
 STATIC_UPLOAD_FOLDER = "./photo_uploads"
@@ -19,8 +22,10 @@ def create_app():
     from .routes import routes
     from .auth import auth
 
+    load_dotenv()
+
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'my_secret_key'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
     app.register_blueprint(routes, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/auth/')
@@ -43,6 +48,20 @@ def create_app():
     def load_user(id):
         return db.session.get(User, int(id))
 
+    # need to enable 2fa in the gmail and create an app
+    # specific password that will be used below
+    # mail might be in the spam folder
+    app.config["MAIL_DEFAULT_SENDER"] = "noreply@flask.com"
+    app.config["MAIL_SERVER"] = "smtp.gmail.com"
+    app.config["MAIL_PORT"] = 587
+    app.config["MAIL_USE_TLS"] = True
+    app.config["MAIL_USE_SSL"] = False
+    app.config["MAIL_DEBUG"] = False
+    app.config["MAIL_USERNAME"] = os.getenv('MAIL_USERNAME')
+    app.config["MAIL_PASSWORD"] = os.getenv('MAIL_PASSWORD')
+
+    mail.init_app(app)
+
     if not os.path.isdir(UPLOAD_FOLDER):
         os.mkdir(UPLOAD_FOLDER)
 
@@ -61,7 +80,7 @@ def create_test_data():
     for user_data in data["users"]:
         username = user_data["username"]
         password = hashing.hash_value(user_data["password"], username)
-        db.session.add(User(username=username, password=password))
+        db.session.add(User(username=username, password=password, email="default@gmail.com", is_verified=True))
 
     users_count = len(data["users"])
 

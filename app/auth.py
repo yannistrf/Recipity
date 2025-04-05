@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, login_user, logout_user, current_user
 from password_strength import PasswordPolicy
+from flask_mail import Message
 from .models import User
-from . import db, hashing
+from . import db, hashing, mail
+from functools import wraps
+from threading import Thread
 
 auth = Blueprint('auth', __name__)
 password_policy = PasswordPolicy.from_names(
@@ -37,6 +40,7 @@ def logout():
 def sign_up():
     if request.method == "POST":
         username = request.form.get("username")
+        email = request.form.get("email")
         password1 = request.form.get("password1")
         password2 = request.form.get("password2")
 
@@ -57,12 +61,63 @@ def sign_up():
         # TODO: make salt a random number and store it in plain text ?
         password = hashing.hash_value(password1, username)
 
-        new_user = User(username=username, password=password)
+        new_user = User(username=username, password=password, email=email)
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Account created successfully", category="success")
+        flash("Account created successfully, a verification link has been sent to your email", category="success")
         login_user(new_user)
+
+        token = hashing.hash_value(password)
+        msg = Message(
+            subject="Recipity mail verification",
+            sender=current_app.config["MAIL_USERNAME"],
+            recipients=[new_user.email],
+        )
+
+        # http://localhost:5000/auth/confirm/{new_user.id}?token={token}
+        msg.body = f'''
+            Welcome to Recipity! Click the link below to confirm your email address
+            { url_for('auth.confirm_mail', user_id=new_user.id, token=token, _external=True) }
+        '''
+        Thread(target=send_mail, args=(current_app._get_current_object(), msg)).start()
+
         return redirect(url_for("routes.home"))
 
     return render_template("sign_up.html", user=current_user)
+
+def send_mail(app, msg):
+    print("Sending mail")
+    with app.app_context():
+        mail.send(msg)
+    print("Sent mail")
+
+@auth.route("/confirm/<int:user_id>")
+def confirm_mail(user_id):
+    if "token" not in request.args.keys():
+        return "No token provided"
+
+    user = db.get_or_404(User, user_id)
+
+    if user.is_verified:
+        return "User already verified"
+
+    token_provided = request.args["token"]
+
+    if not hashing.check_value(token_provided, user.password):
+        return "Invalid token"
+
+    user.is_verified = True
+    db.session.commit()
+    return render_template("verified.html")
+
+
+def verified_required(func):
+    @wraps(func)
+    def wrapper_func(*args,**kwargs):
+        if not current_user.is_verified:
+            return render_template("unverified.html", user=current_user)
+    
+        return func(*args,**kwargs)
+
+    return wrapper_func

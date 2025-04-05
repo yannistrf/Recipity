@@ -43,6 +43,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False, unique=True)
     password = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(128), nullable=False)
+    is_verified = db.Column(db.Boolean, nullable=False, default=False)
     recipes = db.relationship('Recipe', back_populates='user')
     liked_recipes = db.relationship('Recipe', secondary=user_likes_recipe, back_populates='liked_by_users')
     disliked_recipes = db.relationship('Recipe', secondary=user_dislikes_recipe, back_populates='disliked_by_users')

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
+from .auth import verified_required
 from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 from .models import Recipe, User
@@ -18,6 +19,7 @@ def index():
 
 @routes.route("/home", methods=["GET", "POST"])
 @login_required
+@verified_required
 def home():
     if request.method == "POST":
         name = request.form.get("recipeName")
@@ -70,6 +72,7 @@ def home():
 
 @routes.route("/recipe/<int:recipe_id>", methods=["GET", "POST"])
 @login_required
+@verified_required
 def recipe(recipe_id):
     rec = db.session.get(Recipe, recipe_id)
 
@@ -85,6 +88,7 @@ def recipe(recipe_id):
 
 @routes.route("/recipe/<int:recipe_id>/like")
 @login_required
+@verified_required
 def like_recipe(recipe_id):
     rec = db.session.get(Recipe, recipe_id)
 
@@ -103,6 +107,7 @@ def like_recipe(recipe_id):
 
 @routes.route("/recipe/<int:recipe_id>/dislike")
 @login_required
+@verified_required
 def dislike_recipe(recipe_id):
     rec = db.session.get(Recipe, recipe_id)
 
@@ -123,6 +128,7 @@ def dislike_recipe(recipe_id):
 
 @routes.route("user/<int:user_id>/recipes")
 @login_required
+@verified_required
 def user_recipes(user_id):
     user = db.get_or_404(User, user_id)
 
@@ -137,6 +143,7 @@ def user_recipes(user_id):
 
 @routes.route("/recipe/<int:recipe_id>/save")
 @login_required
+@verified_required
 def save_recipe(recipe_id):
     rec = db.session.get(Recipe, recipe_id)
 
@@ -151,6 +158,7 @@ def save_recipe(recipe_id):
 
 @routes.route("user/<int:user_id>/saved")
 @login_required
+@verified_required
 def user_saved_recipes(user_id):
 
     if user_id != current_user.id:
